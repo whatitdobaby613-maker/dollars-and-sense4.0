@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e5a47">
+    <title>Dollars and Sense</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e5a47 0%, #2d7a5f 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+            background: white;
+            border-radius: 50%;
+            padding: 8px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f4d06f;
+        }
+        
+        .app-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            position: sticky;
+            top: 160px;
+            z-index: 99;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-tab.active {
+            color: #1e5a47;
+            border-bottom-color: #f4d06f;
+            background: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .tip-of-day {
+            background: linear-gradient(135deg, #1e5a47 0%, #2d7a5f 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+        
+        .tip-badge {
+            display: inline-block;
+            background: #f4d06f;
+            color: #1e5a47;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .tip-emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .tip-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .complete-btn {
+            background: #f4d06f;
+            color: #1e5a47;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .complete-btn.completed {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tip-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .tip-card.locked {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        
+        .tip-card-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .tip-card-emoji {
+            font-size: 2rem;
+        }
+        
+        .tip-card-number {
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .tip-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e5a47;
+        }
+        
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        
+        .checkbox-wrapper input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1e5a47 0%, #2d7a5f 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-emoji {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e5a47;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .progress-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #1e5a47 0%, #2d7a5f 100%);
+            height: 100%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: width 0.5s;
+        }
+        
+        .placeholder-section {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .placeholder-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e5a47;
+            margin-bottom: 10px;
+        }
+        
+        .placeholder-text {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .placeholder-btn {
+            background: #f4d06f;
+            color: #1e5a47;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .placeholder-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 208, 111, 0.4);
+        }
+        
+        .placeholder-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .coming-soon {
+            display: inline-block;
+            background: #f4d06f;
+            color: #1e5a47;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+        
+        .calculator-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .calculator-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e5a47;
+            margin-bottom: 15px;
+        }
+        
+        .calc-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .calc-input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .calc-input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .calc-result {
+            background: linear-gradient(135deg, #1e5a47 0%, #2d7a5f 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .calc-result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .calc-result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='190' fill='%231e5a47'/%3E%3Ctext x='120' y='230' font-size='120' fill='%2390cdb0' font-weight='bold'%3E%24%3C/text%3E%3Cpath d='M260,100 Q270,90 280,100 L285,105 Q290,110 285,115 L280,120 Q285,125 285,135 L285,145 Q290,150 285,155 L280,160 Q285,165 280,170 L275,175 Q270,180 265,175 L260,170 Q255,165 255,160 L255,150 Q250,145 255,140 L260,135 Q255,130 255,120 L255,110 Q250,105 255,100 Z' fill='%23f4d06f' stroke='%231e5a47' stroke-width='3'/%3E%3Ctext x='200' y='320' font-size='32' fill='%23f4d06f' text-anchor='middle' font-weight='bold'%3EDollars and Sense%3C/text%3E%3C/svg%3E" alt="Logo">
+        </div>
+        <h1 class="app-title">Dollars and Sense</h1>
+        <p class="app-subtitle">Simple money tips for your 20s-30s</p>
+    </div>
+    
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('today')">Today</button>
+        <button class="nav-tab" onclick="showSection('all')">All Tips</button>
+        <button class="nav-tab" onclick="showSection('progress')">Progress</button>
+        <button class="nav-tab" onclick="showSection('more')">More</button>
+    </div>
+    
+    <div class="container">
+        <div id="today" class="section active">
+            <div id="tipOfDay" class="tip-of-day"></div>
+            <h3 style="color: #1e5a47; margin-bottom: 15px;">🔥 Your Learning Path</h3>
+            <div id="learningPath"></div>
+        </div>
+        
+        <div id="all" class="section">
+            <div id="allTipsList"></div>
+        </div>
+        
+        <div id="progress" class="section">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">60</div>
+                    <div class="stat-label">Total Tips</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <div style="font-weight: 700; margin-bottom: 15px; color: #1e5a47;">Overall Progress</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%;">0%</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="more" class="section">
+            <div class="placeholder-section">
+                <div class="placeholder-icon">📅</div>
+                <div class="placeholder-title">Book Coaching Session <span class="coming-soon">Coming Soon</span></div>
+                <div class="placeholder-text">Get personalized 1-on-1 coaching and a custom money blueprint tailored to your situation.</div>
+                <button class="placeholder-btn" disabled>Coming Soon</button>
+            </div>
+            
+            <div class="placeholder-section">
+                <div class="placeholder-icon">💬</div>
+                <div class="placeholder-title">Join WhatsApp Community <span class="coming-soon">Coming Soon</span></div>
+                <div class="placeholder-text">Connect with others on the same money journey. Get daily tips and support.</div>
+                <button class="placeholder-btn" disabled>Coming Soon</button>
+            </div>
+            
+            <h3 style="color: #1e5a47; margin: 30px 0 20px 0; font-size: 1.5rem;">🧮 Money Calculators</h3>
+            
+            <!-- Investment Calculator -->
+            <div class="calculator-section">
+                <div class="calculator-title">📈 Investment Growth Calculator (MOST IMPORTANT!)</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Why this matters:</strong> This shows you the power of compound interest - how your money grows over time. Even small monthly investments become life-changing wealth. The S&P 500 averages 10% annually, so this calculator shows what consistent investing can do for your future. Start early, stay consistent, and watch it compound! 🚀
+                </p>
+                <div class="calc-input-group">
+                    <label>Starting Amount</label>
+                    <input type="number" id="invInitial" placeholder="Current investment balance" value="0" oninput="calculateInvestment()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Monthly Contribution</label>
+                    <input type="number" id="invMonthly" placeholder="How much per month" oninput="calculateInvestment()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Expected Annual Return (%)</label>
+                    <input type="number" id="invReturn" placeholder="S&P 500 averages 10%" value="10" step="0.1" oninput="calculateInvestment()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Years to Invest</label>
+                    <input type="number" id="invYears" placeholder="Time horizon" value="30" oninput="calculateInvestment()">
+                </div>
+                <div id="invResult"></div>
+            </div>
+            
+            <!-- Budget Calculator -->
+            <div class="calculator-section">
+                <div class="calculator-title">💰 Budget Calculator (50/30/20 Rule)</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Why this matters:</strong> The 50/30/20 rule is a simple framework to organize your money: 50% for needs (rent, bills), 30% for wants (fun stuff), 20% for savings and debt. It's flexible - adjust percentages based on your situation. This helps you see if you're spending too much in one area.
+                </p>
+                <div class="calc-input-group">
+                    <label>Monthly Take-Home Income</label>
+                    <input type="number" id="budgetIncome" placeholder="Enter monthly income" oninput="calculateBudget()">
+                </div>
+                <div id="budgetResult"></div>
+            </div>
+            
+            <!-- Emergency Fund Calculator -->
+            <div class="calculator-section">
+                <div class="calculator-title">🛡️ Emergency Fund Calculator</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Why this matters:</strong> An emergency fund is your financial safety net - it protects you from going into debt when life happens (car breaks down, medical bill, job loss). Start with $500, then build to 3-6 months of expenses. This gives you peace of mind and prevents financial disasters.
+                </p>
+                <div class="calc-input-group">
+                    <label>Monthly Expenses</label>
+                    <input type="number" id="efExpenses" placeholder="Enter monthly expenses" oninput="calculateEmergencyFund()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Target Months of Coverage</label>
+                    <input type="number" id="efMonths" placeholder="3-6 months recommended" value="3" oninput="calculateEmergencyFund()">
+                </div>
+                <div id="efResult"></div>
+            </div>
+            
+            <!-- Debt Payoff Calculator -->
+            <div class="calculator-section">
+                <div class="calculator-title">💳 Debt Payoff Calculator</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Why this matters:</strong> High-interest debt (credit cards, personal loans) costs you thousands in interest. This calculator shows exactly when you'll be debt-free and how much interest you'll pay. Seeing the numbers motivates you to pay extra! Even $50 more per month can save you years of payments and tons of interest.
+                </p>
+                <div class="calc-input-group">
+                    <label>Total Debt Balance</label>
+                    <input type="number" id="debtBalance" placeholder="Enter total debt" oninput="calculateDebt()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Interest Rate (%)</label>
+                    <input type="number" id="debtRate" placeholder="Enter interest rate" oninput="calculateDebt()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Monthly Payment</label>
+                    <input type="number" id="debtPayment" placeholder="Enter monthly payment" oninput="calculateDebt()">
+                </div>
+                <div id="debtResult"></div>
+            </div>
+            
+            <!-- Savings Goal Calculator -->
+            <div class="calculator-section">
+                <div class="calculator-title">🎯 Savings Goal Calculator</div>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Why this matters:</strong> Whether you're saving for a vacation, down payment, or just want $1,000 in the bank - this breaks it down into manageable monthly amounts. Goals feel impossible until you do the math. Want $5,000 in 10 months? That's $500/month. Suddenly it's achievable! Turn big dreams into small, consistent actions.
+                </p>
+                <div class="calc-input-group">
+                    <label>Savings Goal</label>
+                    <input type="number" id="savingsGoal" placeholder="Enter target amount" oninput="calculateSavings()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Current Savings</label>
+                    <input type="number" id="currentSavings" placeholder="Enter current amount" value="0" oninput="calculateSavings()">
+                </div>
+                <div class="calc-input-group">
+                    <label>Months to Reach Goal</label>
+                    <input type="number" id="savingsMonths" placeholder="Enter number of months" oninput="calculateSavings()">
+                </div>
+                <div id="savingsResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const allTips = [
+            {id:1,emoji:'💸',title:'Save $5 Today',message:'Put aside $5 right now. Doesn\'t matter how - cash, jar, app, savings account.',action:'Transfer $5 to savings',category:'start'},
+            {id:2,emoji:'🔍',title:'Find Hidden Money',message:'Check couch cushions, old wallets, apps for forgotten gift cards.',action:'Search 3 places for hidden money',category:'start'},
+            {id:3,emoji:'🚫',title:'Cancel One Subscription',message:'Find one subscription you don\'t use anymore.',action:'Review and cancel one subscription',category:'start'},
+            {id:4,emoji:'📊',title:'Track One Day',message:'Write down everything you spend today. Just observe.',action:'Log every dollar spent today',category:'start'},
+            {id:5,emoji:'⏰',title:'24-Hour Rule',message:'Wait 24 hours before any purchase over $50.',action:'Wait 24 hours on next big purchase',category:'start'},
+            {id:6,emoji:'🛟',title:'Safety Net',message:'Open a separate savings account just for emergencies.',action:'Open emergency savings account',category:'start'},
+            {id:7,emoji:'⚙️',title:'Automate $20',message:'Set up automatic $20 transfer to savings weekly.',action:'Schedule automatic savings transfer',category:'start'},
+            {id:8,emoji:'🍳',title:'Cook vs Order',message:'Cook one meal at home instead of ordering out.',action:'Cook one meal this week',category:'start'},
+            {id:9,emoji:'📅',title:'Weekly Check-In',message:'Every Sunday: review your money week.',action:'Set Sunday money review',category:'start'},
+            {id:10,emoji:'🎯',title:'One Goal',message:'Write down ONE clear money goal.',action:'Write specific money goal',category:'start'},
+            {id:11,emoji:'💼',title:'Split Paycheck',message:'X% to savings, Y% to spending each paycheck.',action:'Decide savings percentage',category:'start'},
+            {id:12,emoji:'🎉',title:'Share Win',message:'Share one money success from this month!',action:'Post your win',category:'start'},
+            {id:13,emoji:'🛡️',title:'$500 Fund',message:'Build to $500 emergency fund.',action:'Calculate monthly amount needed',category:'levelup'},
+            {id:14,emoji:'💵',title:'Cash Week',message:'Use only cash for one week.',action:'Withdraw weekly cash',category:'levelup'},
+            {id:15,emoji:'📮',title:'Envelope Method',message:'Allocate cash to spending categories.',action:'Create 3 envelopes',category:'levelup'},
+            {id:16,emoji:'🧮',title:'Price Per Use',message:'Divide cost by how many times you\'ll use it.',action:'Calculate price-per-use for next purchase',category:'levelup'},
+            {id:17,emoji:'📏',title:'50/30/20 Rule',message:'50% needs, 30% wants, 20% savings.',action:'Calculate your current percentages',category:'levelup'},
+            {id:18,emoji:'🎊',title:'Fun Fund',message:'Put aside money just for guilt-free fun spending.',action:'Open fun money account',category:'levelup'},
+            {id:19,emoji:'⚡',title:'Automate Bills',message:'Set up autopay for fixed bills.',action:'Automate 3 recurring bills',category:'levelup'},
+            {id:20,emoji:'💕',title:'Money Date',message:'Dedicate 1 hour monthly to review finances.',action:'Schedule first money date',category:'levelup'},
+            {id:21,emoji:'📊',title:'Net Worth',message:'Assets minus debts = net worth.',action:'Calculate your net worth',category:'levelup'},
+            {id:22,emoji:'🕳️',title:'Money Leak',message:'Identify your #1 unnecessary expense.',action:'Find your biggest leak',category:'levelup'},
+            {id:23,emoji:'💳',title:'Credit Score',message:'Check your score monthly.',action:'Check credit score today',category:'levelup'},
+            {id:24,emoji:'🤝',title:'Share Challenge',message:'Share your toughest money obstacle.',action:'Post one challenge',category:'levelup'},
+            {id:25,emoji:'🏦',title:'High-Yield Savings',message:'4-5% interest vs 0.01%.',action:'Research high-yield accounts',category:'advanced'},
+            {id:26,emoji:'💎',title:'Optimize Cards',message:'Pay in full, enjoy rewards.',action:'Review card strategy',category:'advanced'},
+            {id:27,emoji:'🔍',title:'Credit Monitoring',message:'Free alerts protect your identity.',action:'Enable credit monitoring',category:'advanced'},
+            {id:28,emoji:'📚',title:'Investment Basics',message:'Learn stocks, bonds, index funds.',action:'Read investing article',category:'advanced'},
+            {id:29,emoji:'🚀',title:'Investment Account',message:'Compare brokerages.',action:'Research platforms',category:'advanced'},
+            {id:30,emoji:'💹',title:'First Investment',message:'Start with $10 into index fund.',action:'Make first investment',category:'advanced'},
+            {id:31,emoji:'🎯',title:'Zero-Based Budget',message:'Every dollar has a job.',action:'Create zero-based budget',category:'advanced'},
+            {id:32,emoji:'🛥️',title:'Sinking Funds',message:'Save monthly for annual expenses.',action:'List annual expenses',category:'advanced'},
+            {id:33,emoji:'📈',title:'Track Growth',message:'Check quarterly, not daily.',action:'Set quarterly check-in',category:'advanced'},
+            {id:34,emoji:'🧠',title:'Money Triggers',message:'What makes you spend emotionally?',action:'List 3 spending triggers',category:'advanced'},
+            {id:35,emoji:'🌟',title:'Abundance Mindset',message:'How can I afford it vs I can\'t.',action:'Reframe one thought',category:'advanced'},
+            {id:36,emoji:'🏆',title:'Celebrate Progress',message:'Review how far you\'ve come.',action:'List 5 wins',category:'advanced'},
+            {id:37,emoji:'💪',title:'Side Hustle',message:'What could you do for extra income?',action:'List 3 skills to monetize',category:'expert'},
+            {id:38,emoji:'☎️',title:'Negotiate Bill',message:'Ask: What\'s your best rate?',action:'Negotiate one bill',category:'expert'},
+            {id:39,emoji:'💰',title:'Sell Items',message:'Declutter for cash.',action:'List 3 items to sell',category:'expert'},
+            {id:40,emoji:'📋',title:'Read Paycheck',message:'Know deductions and benefits.',action:'Review recent paystub',category:'expert'},
+            {id:41,emoji:'🎯',title:'Roth IRA',message:'Tax-free retirement growth.',action:'Research Roth eligibility',category:'expert'},
+            {id:42,emoji:'📝',title:'Tax Deductions',message:'Keep records all year.',action:'Start tax folder',category:'expert'},
+            {id:43,emoji:'🗓️',title:'1-Year Goal',message:'Where financially in 12 months?',action:'Write 1-year vision',category:'expert'},
+            {id:44,emoji:'🔮',title:'Future Value',message:'See what saving becomes in 10/20/30 years.',action:'Calculate 10-year projection',category:'expert'},
+            {id:45,emoji:'📊',title:'Increase Investment',message:'Scale as income grows.',action:'Increase contribution',category:'expert'},
+            {id:46,emoji:'🛒',title:'Grocery Master',message:'Meal planning, bulk buying.',action:'Plan next week meals',category:'expert'},
+            {id:47,emoji:'📋',title:'30-Day Want List',message:'Write desires, revisit monthly.',action:'Start want list',category:'expert'},
+            {id:48,emoji:'💡',title:'Energy Audit',message:'Reduce utility costs.',action:'Review 3 months bills',category:'expert'},
+            {id:49,emoji:'🚗',title:'Transportation Cost',message:'Calculate true commute cost.',action:'Calculate monthly transport',category:'lifestyle'},
+            {id:50,emoji:'🏠',title:'Housing Review',message:'Your biggest expense.',action:'Review housing vs income',category:'lifestyle'},
+            {id:51,emoji:'🛡️',title:'Insurance Check',message:'Not over or under-insured.',action:'Get 3 insurance quotes',category:'lifestyle'},
+            {id:52,emoji:'👥',title:'Budget Social Life',message:'Free activities, potluck dinners.',action:'Plan free social activity',category:'lifestyle'},
+            {id:53,emoji:'📺',title:'Streaming Audit',message:'Do you need all 5 services?',action:'Cut one streaming service',category:'lifestyle'},
+            {id:54,emoji:'✈️',title:'Travel Hacking',message:'Credit rewards, budget travel.',action:'Research rewards program',category:'lifestyle'},
+            {id:55,emoji:'🔧',title:'Money-Saving Skill',message:'Basic repairs, cooking.',action:'Choose skill to learn',category:'lifestyle'},
+            {id:56,emoji:'💼',title:'Negotiate Raise',message:'You miss 100% you don\'t ask for.',action:'Document your wins',category:'lifestyle'},
+            {id:57,emoji:'🌟',title:'Personal Brand',message:'LinkedIn, networking.',action:'Update LinkedIn profile',category:'lifestyle'},
+            {id:58,emoji:'⚖️',title:'Rebalance Portfolio',message:'Check quarterly allocation.',action:'Check asset allocation',category:'lifestyle'},
+            {id:59,emoji:'📊',title:'Tax-Loss Harvest',message:'Offset gains with losses.',action:'Research tax-loss harvesting',category:'lifestyle'},
+            {id:60,emoji:'💪',title:'6-Month Fund Complete',message:'Full safety net achieved!',action:'Celebrate and maintain',category:'lifestyle'}
+        ];
+        
+        let completed = JSON.parse(localStorage.getItem('completed') || '[]');
+        let times = JSON.parse(localStorage.getItem('times') || '{}');
+        
+        function getCurrentTip() {
+            return allTips.find(t => !completed.includes(t.id)) || allTips[allTips.length-1];
+        }
+        
+        function isLocked(id) {
+            if (id === 1) return false;
+            const prev = allTips.find(t => t.id === id-1);
+            return !prev || !completed.includes(prev.id);
+        }
+        
+        function toggle(id) {
+            if (isLocked(id)) {
+                alert('🔒 Complete the previous tip first!');
+                return;
+            }
+            if (completed.includes(id)) {
+                completed = completed.filter(x => x !== id);
+                delete times[id];
+            } else {
+                completed.push(id);
+                times[id] = Date.now();
+            }
+            localStorage.setItem('completed', JSON.stringify(completed));
+            localStorage.setItem('times', JSON.stringify(times));
+            render();
+        }
+        
+        function openModal(id) {
+            const tip = allTips.find(t => t.id === id);
+            if (!tip || isLocked(id)) return;
+            const done = completed.includes(id);
+            document.getElementById('modalContent').innerHTML = `
+                <div class="modal-emoji">${tip.emoji}</div>
+                <div class="tip-badge">Tip #${tip.id}</div>
+                <div class="modal-title">${tip.title}</div>
+                <p style="text-align:center;margin-bottom:20px;">${tip.message}</p>
+                <div style="background:rgba(255,255,255,0.2);padding:15px;border-radius:8px;margin-bottom:20px;text-align:center;">
+                    <div style="font-size:0.8rem;opacity:0.8;margin-bottom:5px;">ACTION:</div>
+                    ${tip.action}
+                </div>
+                <button class="complete-btn ${done?'completed':''}" onclick="toggle(${tip.id})">
+                    ${done?'✓ Completed!':'Mark Complete'}
+                </button>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function render() {
+            const current = getCurrentTip();
+            const locked = isLocked(current.id);
+            const done = completed.includes(current.id);
+            
+            document.getElementById('tipOfDay').innerHTML = `
+                <div class="tip-badge">💡 Tip #${current.id}</div>
+                <div class="tip-emoji">${current.emoji}</div>
+                <div class="tip-title">${current.title}</div>
+                <p style="margin-bottom:15px;">${current.message}</p>
+                <div style="background:rgba(255,255,255,0.2);padding:12px;border-radius:8px;margin-bottom:10px;">
+                    <div style="font-size:0.8rem;opacity:0.8;margin-bottom:5px;">TODAY'S ACTION:</div>
+                    ${current.action}
+                </div>
+                <button class="complete-btn ${done?'completed':''}" ${locked?'disabled':''} onclick="toggle(${current.id}); event.stopPropagation();">
+                    ${locked ? '🔒 Locked' : done ? '✓ Completed!' : 'Mark Complete'}
+                </button>
+            `;
+            
+            document.getElementById('tipOfDay').onclick = locked ? null : () => openModal(current.id);
+            
+            const next5 = allTips.slice(Math.max(0,current.id-1), Math.min(allTips.length,current.id+4));
+            document.getElementById('learningPath').innerHTML = next5.map(t => {
+                const lock = isLocked(t.id);
+                const done = completed.includes(t.id);
+                return `
+                    <div class="tip-card ${lock?'locked':''}" onclick="${lock?'':'openModal('+t.id+')'}">
+                        ${lock ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:10;">
+                            <div style="font-size:3rem;">🔒</div>
+                            <div style="font-weight:700;background:white;padding:8px 16px;border-radius:20px;color:#1e5a47;margin-top:10px;">Locked</div>
+                        </div>` : ''}
+                        <div class="tip-card-header">
+                            <div class="tip-card-emoji">${t.emoji}</div>
+                            <div>
+                                <div class="tip-card-number">Tip #${t.id}</div>
+                                <div class="tip-card-title">${t.title}</div>
+                            </div>
+                        </div>
+                        <p style="margin-bottom:12px;">${t.message}</p>
+                        <div class="checkbox-wrapper" onclick="event.stopPropagation(); ${lock?'':'toggle('+t.id+')'}">
+                            <input type="checkbox" ${done?'checked':''} ${lock?'disabled':''} onclick="event.stopPropagation(); ${lock?'':'toggle('+t.id+')'}">
+                            <span style="font-weight:600;color:#1e5a47;">${done?'Completed!':lock?'Locked':'Mark as done'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('allTipsList').innerHTML = allTips.map(t => {
+                const lock = isLocked(t.id);
+                const done = completed.includes(t.id);
+                return `
+                    <div class="tip-card ${lock?'locked':''}" onclick="${lock?'':'openModal('+t.id+')'}">
+                        ${lock ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:10;">
+                            <div style="font-size:3rem;">🔒</div>
+                            <div style="font-weight:700;background:white;padding:8px 16px;border-radius:20px;color:#1e5a47;margin-top:10px;">Locked</div>
+                        </div>` : ''}
+                        <div class="tip-card-header">
+                            <div class="tip-card-emoji">${t.emoji}</div>
+                            <div>
+                                <div class="tip-card-number">Tip #${t.id}</div>
+                                <div class="tip-card-title">${t.title}</div>
+                            </div>
+                        </div>
+                        <p>${t.message}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            const pct = Math.round((completed.length / allTips.length) * 100);
+            document.getElementById('completedCount').textContent = completed.length;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct + '%';
+        }
+        
+        // Calculator Functions
+        function calculateInvestment() {
+            const initial = parseFloat(document.getElementById('invInitial').value) || 0;
+            const monthly = parseFloat(document.getElementById('invMonthly').value);
+            const rate = parseFloat(document.getElementById('invReturn').value) / 100 / 12;
+            const years = parseFloat(document.getElementById('invYears').value);
+            
+            if (!monthly || monthly <= 0 || !years || years <= 0) {
+                document.getElementById('invResult').innerHTML = '';
+                return;
+            }
+            
+            const months = years * 12;
+            let balance = initial;
+            let totalContributions = initial;
+            
+            for (let i = 0; i < months; i++) {
+                balance = balance * (1 + rate) + monthly;
+                totalContributions += monthly;
+            }
+            
+            const earnings = balance - totalContributions;
+            
+            document.getElementById('invResult').innerHTML = `
+                <div class="calc-result">
+                    <div style="margin-bottom:20px;">
+                        <div class="calc-result-label">Future Value</div>
+                        <div class="calc-result-value">${balance.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:0.9rem;opacity:0.95;">
+                        <div>
+                            <div style="margin-bottom:5px;">Your Contributions</div>
+                            <div style="font-size:1.5rem;font-weight:700;">${totalContributions.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                        </div>
+                        <div>
+                            <div style="margin-bottom:5px;">Investment Earnings</div>
+                            <div style="font-size:1.5rem;font-weight:700;">${earnings.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.3);font-size:0.95rem;opacity:0.9;">
+                        💡 Investing ${monthly}/month for ${years} years = <strong>${earnings.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong> in free money from compound growth!
+                    </div>
+                </div>
+            `;
+        }
+        
+        function calculateBudget() {
+            const income = parseFloat(document.getElementById('budgetIncome').value);
+            if (!income || income <= 0) {
+                document.getElementById('budgetResult').innerHTML = '';
+                return;
+            }
+            const needs = income * 0.5;
+            const wants = income * 0.3;
+            const savings = income * 0.2;
+            document.getElementById('budgetResult').innerHTML = `
+                <div class="calc-result">
+                    <div style="margin-bottom:20px;">
+                        <div class="calc-result-label">50% Needs (rent, bills, groceries)</div>
+                        <div class="calc-result-value">${needs.toFixed(0)}</div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <div class="calc-result-label">30% Wants (fun, dining out, hobbies)</div>
+                        <div class="calc-result-value">${wants.toFixed(0)}</div>
+                    </div>
+                    <div>
+                        <div class="calc-result-label">20% Savings & Debt</div>
+                        <div class="calc-result-value">${savings.toFixed(0)}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function calculateEmergencyFund() {
+            const expenses = parseFloat(document.getElementById('efExpenses').value);
+            const months = parseFloat(document.getElementById('efMonths').value) || 3;
+            if (!expenses || expenses <= 0) {
+                document.getElementById('efResult').innerHTML = '';
+                return;
+            }
+            const target = expenses * months;
+            document.getElementById('efResult').innerHTML = `
+                <div class="calc-result">
+                    <div class="calc-result-label">${months}-Month Emergency Fund Target</div>
+                    <div class="calc-result-value">${target.toFixed(0)}</div>
+                    <div style="margin-top:15px;font-size:0.9rem;opacity:0.9;">Save ${(target/6).toFixed(0)}/month to reach in 6 months</div>
+                </div>
+            `;
+        }
+        
+        function calculateDebt() {
+            const balance = parseFloat(document.getElementById('debtBalance').value);
+            const rate = parseFloat(document.getElementById('debtRate').value) / 100 / 12;
+            const payment = parseFloat(document.getElementById('debtPayment').value);
+            
+            if (!balance || !payment || balance <= 0 || payment <= 0) {
+                document.getElementById('debtResult').innerHTML = '';
+                return;
+            }
+            
+            if (payment <= balance * rate) {
+                document.getElementById('debtResult').innerHTML = `
+                    <div class="calc-result" style="background:#ef4444;">
+                        <div class="calc-result-label">⚠️ Warning</div>
+                        <div style="font-size:1.1rem;">Payment too low! You need at least ${(balance * rate * 1.5).toFixed(0)}/month to make progress.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let months = 0;
+            let remaining = balance;
+            while (remaining > 0 && months < 600) {
+                remaining = remaining * (1 + rate) - payment;
+                months++;
+            }
+            
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            const totalPaid = payment * months;
+            const interest = totalPaid - balance;
+            
+            document.getElementById('debtResult').innerHTML = `
+                <div class="calc-result">
+                    <div class="calc-result-label">Debt-Free In</div>
+                    <div class="calc-result-value">${years > 0 ? years + 'y ' : ''}${remainingMonths}m</div>
+                    <div style="margin-top:15px;font-size:0.9rem;opacity:0.9;">Total Interest: ${interest.toFixed(0)}</div>
+                </div>
+            `;
+        }
+        
+        function calculateSavings() {
+            const goal = parseFloat(document.getElementById('savingsGoal').value);
+            const current = parseFloat(document.getElementById('currentSavings').value) || 0;
+            const months = parseFloat(document.getElementById('savingsMonths').value);
+            
+            if (!goal || !months || goal <= 0 || months <= 0) {
+                document.getElementById('savingsResult').innerHTML = '';
+                return;
+            }
+            
+            const needed = goal - current;
+            const monthly = needed / months;
+            
+            document.getElementById('savingsResult').innerHTML = `
+                <div class="calc-result">
+                    <div class="calc-result-label">Monthly Savings Needed</div>
+                    <div class="calc-result-value">${monthly.toFixed(0)}</div>
+                    <div style="margin-top:15px;font-size:0.9rem;opacity:0.9;">Save ${monthly.toFixed(0)}/month for ${months} months to reach ${goal.toFixed(0)}</div>
+                </div>
+            `;
+        }
+        
+        render();
+    </script>
+</body>
+</html>
